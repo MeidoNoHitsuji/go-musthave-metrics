@@ -1,22 +1,19 @@
 package main
 
-import "net/http"
-
-var Store MemStorage
+import (
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/middlewares"
+	"log"
+	"net/http"
+)
 
 func main() {
-	Store = MemStorage{
-		mGauge:   make(map[string]float64),
-		mFloat64: make(map[string]float64),
-		mCounter: make(map[string]int64),
-		mInt64:   make(map[string]int64),
-	}
-
 	mux := http.NewServeMux()
-	mux.HandleFunc("/update/", AddMetric)
+	mux.HandleFunc("/update/", handlers.AddMetric)
 
-	err := http.ListenAndServe(":8080", OnlyPOTS(mux))
+	log.Printf("Сервер запущен")
+	err := http.ListenAndServe(":8080", middlewares.OnlyPOTS(mux))
 	if err != nil {
-		return
+		log.Fatalf(err.Error())
 	}
 }
