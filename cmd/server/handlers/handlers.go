@@ -1,21 +1,26 @@
-package main
+package handlers
 
 import (
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/storage"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
+type MetricType string
+
 const (
-	GAUGE   = "gauge"
-	FLOAT   = "float64"
-	COUNTER = "counter"
-	INT     = "int64"
+	GAUGE   = MetricType("gauge")
+	FLOAT   = MetricType("float64")
+	COUNTER = MetricType("counter")
+	INT     = MetricType("int64")
 )
 
 func AddMetric(res http.ResponseWriter, req *http.Request) {
 	keys := strings.Split(strings.Trim(req.URL.String(), "/"), "/")
 	keys = keys[1:]
+	//res.Write(make([]byte, 0))
 
 	if len(keys) == 1 {
 		res.WriteHeader(http.StatusNotFound)
@@ -30,34 +35,38 @@ func AddMetric(res http.ResponseWriter, req *http.Request) {
 	value := keys[2]
 
 	switch typeMetric {
-	case GAUGE:
+	case string(GAUGE):
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
+			log.Printf("Ошибка параметра в Float: %s", err.Error())
 			return
 		}
-		Store.addGauge(key, v)
-	case FLOAT:
+		storage.Store.AddGauge(key, v)
+	case string(FLOAT):
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
+			log.Printf("Ошибка параметра в Float: %s", err.Error())
 			return
 		}
-		Store.addFloat(key, v)
-	case COUNTER:
+		storage.Store.AddFloat(key, v)
+	case string(COUNTER):
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
+			log.Printf("Ошибка параметра в Int: %s", err.Error())
 			return
 		}
-		Store.addCounter(key, v)
-	case INT:
+		storage.Store.AddCounter(key, v)
+	case string(INT):
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
+			log.Printf("Ошибка параметра в Float: %s", err.Error())
 			return
 		}
-		Store.addInt(key, v)
+		storage.Store.AddInt(key, v)
 	default:
 		res.WriteHeader(http.StatusBadRequest)
 		return
