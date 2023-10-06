@@ -1,3 +1,7 @@
+SERVER_PORT:=$(shell ./get_free_port.sh)
+ADDRESS:="localhost:${SERVER_PORT}"
+TEMP_FILE:=./tmp
+
 .PHONY: build
 build:
 	cd ./cmd/server && \
@@ -14,6 +18,7 @@ test-all:
 	make test1
 	make test2
 	make test3
+	make test4
 
 .PHONY: test1
 test1:
@@ -26,3 +31,7 @@ test2:
 .PHONY: test3
 test3:
 	./metricstest -test.v -test.run=^TestIteration3[AB]*$$ -source-path=. -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server
+
+.PHONY: test4
+test4:
+	./metricstest -test.v -test.run=^TestIteration4$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
