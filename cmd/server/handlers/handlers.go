@@ -95,7 +95,7 @@ func GetMetric(res http.ResponseWriter, req *http.Request) {
 		if v, exists := storage.Store.MGauge[key]; !exists {
 			res.WriteHeader(http.StatusNotFound)
 		} else {
-			io.WriteString(res, fmt.Sprintf("%s", v))
+			io.WriteString(res, v)
 		}
 	case string(FLOAT):
 		key := chi.URLParam(req, "key")
