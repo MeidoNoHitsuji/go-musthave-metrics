@@ -8,7 +8,7 @@ import (
 
 func TestMemStorage_AddCounter(t *testing.T) {
 	type fields struct {
-		MGauge   map[string]float64
+		MGauge   map[string]string
 		MFloat64 map[string]float64
 		MCounter map[string]int64
 		MInt64   map[string]int64
@@ -26,7 +26,7 @@ func TestMemStorage_AddCounter(t *testing.T) {
 		{
 			name: "Проверка добавления",
 			fields: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
 				MInt64:   make(map[string]int64),
@@ -36,7 +36,7 @@ func TestMemStorage_AddCounter(t *testing.T) {
 				v: 123,
 			},
 			want: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: map[string]int64{
 					"key": 123,
@@ -61,7 +61,7 @@ func TestMemStorage_AddCounter(t *testing.T) {
 
 func TestMemStorage_AddFloat(t *testing.T) {
 	type fields struct {
-		MGauge   map[string]float64
+		MGauge   map[string]string
 		MFloat64 map[string]float64
 		MCounter map[string]int64
 		MInt64   map[string]int64
@@ -79,7 +79,7 @@ func TestMemStorage_AddFloat(t *testing.T) {
 		{
 			name: "Проверка добавления",
 			fields: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
 				MInt64:   make(map[string]int64),
@@ -89,7 +89,7 @@ func TestMemStorage_AddFloat(t *testing.T) {
 				v: 123,
 			},
 			want: fields{
-				MGauge: make(map[string]float64),
+				MGauge: make(map[string]string),
 				MFloat64: map[string]float64{
 					"key": 123,
 				},
@@ -114,14 +114,14 @@ func TestMemStorage_AddFloat(t *testing.T) {
 
 func TestMemStorage_AddGauge(t *testing.T) {
 	type fields struct {
-		MGauge   map[string]float64
+		MGauge   map[string]string
 		MFloat64 map[string]float64
 		MCounter map[string]int64
 		MInt64   map[string]int64
 	}
 	type args struct {
 		k string
-		v float64
+		v string
 	}
 	tests := []struct {
 		name   string
@@ -132,18 +132,18 @@ func TestMemStorage_AddGauge(t *testing.T) {
 		{
 			name: "Проверка добавления",
 			fields: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
 				MInt64:   make(map[string]int64),
 			},
 			args: args{
 				k: "key",
-				v: 123,
+				v: "123",
 			},
 			want: fields{
-				MGauge: map[string]float64{
-					"key": 123,
+				MGauge: map[string]string{
+					"key": "123",
 				},
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
@@ -167,7 +167,7 @@ func TestMemStorage_AddGauge(t *testing.T) {
 
 func TestMemStorage_AddInt(t *testing.T) {
 	type fields struct {
-		MGauge   map[string]float64
+		MGauge   map[string]string
 		MFloat64 map[string]float64
 		MCounter map[string]int64
 		MInt64   map[string]int64
@@ -185,7 +185,7 @@ func TestMemStorage_AddInt(t *testing.T) {
 		{
 			name: "Проверка добавления",
 			fields: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
 				MInt64:   make(map[string]int64),
@@ -195,7 +195,7 @@ func TestMemStorage_AddInt(t *testing.T) {
 				v: 123,
 			},
 			want: fields{
-				MGauge:   make(map[string]float64),
+				MGauge:   make(map[string]string),
 				MFloat64: make(map[string]float64),
 				MCounter: make(map[string]int64),
 				MInt64: map[string]int64{
