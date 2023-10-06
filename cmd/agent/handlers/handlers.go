@@ -3,11 +3,11 @@ package handlers
 import (
 	"fmt"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/storage"
+	"github.com/go-resty/resty/v2"
+	"log"
 	"math/rand"
-	"net/http"
 	"runtime"
 	"strconv"
-	"strings"
 )
 
 type MetricType string
@@ -22,19 +22,15 @@ const (
 )
 
 func SendMetric(m MetricType, name string, value string) (interface{}, error) {
-	resp, err := http.Post(fmt.Sprintf("http://localhost:8080/update/%s/%s/%s", m, name, value), "text/plain", strings.NewReader(""))
+	client := resty.New()
+
+	_, err := client.R().
+		Post(fmt.Sprintf("http://localhost:8080/update/%s/%s/%s", m, name, value))
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+
 	return nil, nil
-	//var res map[string]interface{}
-	//err = json.NewDecoder(resp.Body).Decode(&res)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//form := res["form"]
-	//return form, nil
 }
 
 func LoadMetric() {
@@ -74,7 +70,7 @@ func SendMetrics() {
 	for k, v := range storage.Store.MGauge {
 		_, err := SendMetric(GAUGE, k, v)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("Ошибка при отправке метрики в Gauge: %s", err.Error())
 		}
 	}
 
@@ -83,7 +79,7 @@ func SendMetrics() {
 	for k, v := range storage.Store.MCounter {
 		_, err := SendMetric(COUNTER, k, strconv.FormatInt(v, 10))
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("Ошибка при отправке метрики в Counter: %s", err.Error())
 		}
 	}
 
