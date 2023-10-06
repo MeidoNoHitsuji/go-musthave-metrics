@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/handlers"
 	"log"
 	"os"
@@ -9,10 +10,17 @@ import (
 	"time"
 )
 
+var (
+	reportInterval = flag.Int("r", 10, "Частота отправки метрик на сервер")
+	pollInterval   = flag.Int("p", 2, "Частота опроса метрик")
+)
+
 func main() {
+	flag.Parse()
+
 	go func() {
 		for {
-			time.Sleep(2 * time.Second)
+			time.Sleep(time.Duration(*pollInterval) * time.Second)
 			handlers.LoadMetric()
 			log.Printf("Метрики собраны")
 		}
@@ -20,7 +28,7 @@ func main() {
 
 	go func() {
 		for {
-			time.Sleep(10 * time.Second)
+			time.Sleep(time.Duration(*reportInterval) * time.Second)
 			handlers.SendMetrics()
 			log.Printf("Метрики отправлены")
 		}
