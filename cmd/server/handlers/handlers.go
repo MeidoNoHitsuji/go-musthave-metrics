@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/storage"
+	"github.com/go-chi/chi/v5"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,58 +20,110 @@ const (
 	INT     = MetricType("int64")
 )
 
-func AddMetric(res http.ResponseWriter, req *http.Request) {
-	keys := strings.Split(strings.Trim(req.URL.String(), "/"), "/")
-	keys = keys[1:]
-	//res.Write(make([]byte, 0))
+func GetMetrics(res http.ResponseWriter, req *http.Request) {
+	list := make([]string, 0)
 
-	if len(keys) == 1 {
-		res.WriteHeader(http.StatusNotFound)
-		return
-	} else if len(keys) < 3 {
-		res.WriteHeader(http.StatusBadRequest)
-		return
+	for s, f := range storage.Store.MGauge {
+		list = append(list, fmt.Sprintf("%s = %s", s, f))
 	}
 
-	typeMetric := keys[0]
-	key := keys[1]
-	value := keys[2]
+	for s, f := range storage.Store.MFloat64 {
+		list = append(list, fmt.Sprintf("%s = %f", s, f))
+	}
 
-	switch typeMetric {
-	case string(GAUGE):
-		v, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
-			return
-		}
-		storage.Store.AddGauge(key, v)
-	case string(FLOAT):
-		v, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
-			return
-		}
-		storage.Store.AddFloat(key, v)
-	case string(COUNTER):
-		v, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Int: %s", err.Error())
-			return
-		}
-		storage.Store.AddCounter(key, v)
-	case string(INT):
-		v, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
-			return
-		}
-		storage.Store.AddInt(key, v)
-	default:
+	for s, f := range storage.Store.MCounter {
+		list = append(list, fmt.Sprintf("%s = %d", s, f))
+	}
+
+	for s, f := range storage.Store.MInt64 {
+		list = append(list, fmt.Sprintf("%s = %d", s, f))
+	}
+
+	io.WriteString(res, strings.Join(list, "\n"))
+}
+
+func AddGauge(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+	value := chi.URLParam(req, "value")
+
+	storage.Store.AddGauge(key, value)
+}
+
+func GetGauge(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+
+	if v, exists := storage.Store.MGauge[key]; !exists {
+		res.WriteHeader(http.StatusNotFound)
+	} else {
+		io.WriteString(res, fmt.Sprintf("%s", v))
+	}
+}
+
+func AddFloat(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+	value := chi.URLParam(req, "value")
+
+	v, err := strconv.ParseFloat(value, 64)
+	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
+		log.Printf("Ошибка параметра в Float: %s", err.Error())
 		return
+	}
+	storage.Store.AddFloat(key, v)
+}
+
+func GetFloat(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+
+	if v, exists := storage.Store.MFloat64[key]; !exists {
+		res.WriteHeader(http.StatusNotFound)
+	} else {
+		io.WriteString(res, fmt.Sprintf("%f", v))
+	}
+}
+
+func AddCounter(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+	value := chi.URLParam(req, "value")
+
+	v, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		log.Printf("Ошибка параметра в Int: %s", err.Error())
+		return
+	}
+	storage.Store.AddCounter(key, v)
+}
+
+func GetCounter(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+
+	if v, exists := storage.Store.MCounter[key]; !exists {
+		res.WriteHeader(http.StatusNotFound)
+	} else {
+		io.WriteString(res, fmt.Sprintf("%d", v))
+	}
+}
+
+func AddInt(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+	value := chi.URLParam(req, "value")
+
+	v, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		log.Printf("Ошибка параметра в Float: %s", err.Error())
+		return
+	}
+	storage.Store.AddInt(key, v)
+}
+
+func GetInt(res http.ResponseWriter, req *http.Request) {
+	key := chi.URLParam(req, "key")
+
+	if v, exists := storage.Store.MCounter[key]; !exists {
+		res.WriteHeader(http.StatusNotFound)
+	} else {
+		io.WriteString(res, fmt.Sprintf("%d", v))
 	}
 }

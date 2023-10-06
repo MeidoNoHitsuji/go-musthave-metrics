@@ -5,22 +5,22 @@ import (
 )
 
 type MemStorage struct {
-	MGauge   map[string]float64
+	MGauge   map[string]string
 	MFloat64 map[string]float64
 	MCounter map[string]int64
 	MInt64   map[string]int64
 }
 
 var Store *MemStorage = &MemStorage{
-	MGauge:   make(map[string]float64),
+	MGauge:   make(map[string]string),
 	MFloat64: make(map[string]float64),
 	MCounter: make(map[string]int64),
 	MInt64:   make(map[string]int64),
 }
 
-func (s MemStorage) AddGauge(k string, v float64) {
+func (s MemStorage) AddGauge(k string, v string) {
 	s.MGauge[k] = v
-	log.Printf("Gauge со значением %s перезаписан на %f", k, v)
+	log.Printf("Gauge со значением %s перезаписан на %s", k, v)
 }
 
 func (s MemStorage) AddFloat(k string, v float64) {
