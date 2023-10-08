@@ -68,7 +68,7 @@ func AddMetric(res http.ResponseWriter, req *http.Request) {
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Int: %s", err.Error())
+			log.Printf("Ошибка параметра в COUNTER: %s", err.Error())
 			return
 		}
 		storage.Store.AddCounter(key, v)
@@ -76,7 +76,7 @@ func AddMetric(res http.ResponseWriter, req *http.Request) {
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
+			log.Printf("Ошибка параметра в INT: %s", err.Error())
 			return
 		}
 		storage.Store.AddInt(key, v)
@@ -116,7 +116,7 @@ func GetMetric(res http.ResponseWriter, req *http.Request) {
 	case string(INT):
 		key := chi.URLParam(req, "key")
 
-		if v, exists := storage.Store.MCounter[key]; !exists {
+		if v, exists := storage.Store.MInt64[key]; !exists {
 			res.WriteHeader(http.StatusNotFound)
 		} else {
 			io.WriteString(res, fmt.Sprintf("%d", v))
