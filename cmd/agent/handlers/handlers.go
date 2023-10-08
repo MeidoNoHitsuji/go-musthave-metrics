@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"flag"
 	"fmt"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/flags"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/storage"
 	"github.com/go-resty/resty/v2"
 	"log"
@@ -14,7 +14,6 @@ import (
 type MetricType string
 
 var (
-	addr   = flag.String("a", "localhost:8080", "Адрес сервера формата host:port")
 	RStats runtime.MemStats
 )
 
@@ -29,7 +28,7 @@ func SendMetric(m MetricType, name string, value string) (interface{}, error) {
 	client := resty.New()
 
 	_, err := client.R().
-		Post(fmt.Sprintf("http://%s/update/%s/%s/%s", *addr, m, name, value))
+		Post(fmt.Sprintf("http://%s/update/%s/%s/%s", flags.Addr, m, name, value))
 	if err != nil {
 		return nil, err
 	}
