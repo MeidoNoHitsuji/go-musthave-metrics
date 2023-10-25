@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/agent"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/flags"
 	"log"
 	"os"
@@ -19,7 +19,7 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Duration(flags.RollInterval) * time.Second)
-			handlers.LoadMetric()
+			agent.LoadMetric()
 			log.Printf("Метрики собраны")
 		}
 	}()
@@ -27,7 +27,7 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Duration(flags.ReportInterval) * time.Second)
-			handlers.SendMetrics()
+			agent.SendMetrics()
 			log.Printf("Метрики отправлены")
 		}
 	}()
