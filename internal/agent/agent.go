@@ -36,55 +36,55 @@ func SendMetric(m MetricType, name string, value string) (interface{}, error) {
 	return nil, nil
 }
 
-func LoadMetric() {
+func LoadMetric(store *storage.Storage) {
 	runtime.ReadMemStats(&RStats)
-	storage.Store.AddGauge("Alloc", RStats.Alloc)
-	storage.Store.AddGauge("BuckHashSys", RStats.BuckHashSys)
-	storage.Store.AddGauge("Frees", RStats.Frees)
-	storage.Store.AddGauge("GCCPUFraction", RStats.GCCPUFraction)
-	storage.Store.AddGauge("GCSys", RStats.GCSys)
-	storage.Store.AddGauge("HeapAlloc", RStats.HeapAlloc)
-	storage.Store.AddGauge("HeapIdle", RStats.HeapIdle)
-	storage.Store.AddGauge("HeapInuse", RStats.HeapInuse)
-	storage.Store.AddGauge("HeapObjects", RStats.HeapObjects)
-	storage.Store.AddGauge("HeapReleased", RStats.HeapReleased)
-	storage.Store.AddGauge("HeapSys", RStats.HeapSys)
-	storage.Store.AddGauge("LastGC", RStats.LastGC)
-	storage.Store.AddGauge("Lookups", RStats.Lookups)
-	storage.Store.AddGauge("MCacheInuse", RStats.MCacheInuse)
-	storage.Store.AddGauge("MCacheSys", RStats.MCacheSys)
-	storage.Store.AddGauge("MSpanInuse", RStats.MSpanInuse)
-	storage.Store.AddGauge("MSpanSys", RStats.MSpanSys)
-	storage.Store.AddGauge("Mallocs", RStats.Mallocs)
-	storage.Store.AddGauge("NextGC", RStats.NextGC)
-	storage.Store.AddGauge("NumForcedGC", RStats.NumForcedGC)
-	storage.Store.AddGauge("NumGC", RStats.NumGC)
-	storage.Store.AddGauge("OtherSys", RStats.OtherSys)
-	storage.Store.AddGauge("PauseTotalNs", RStats.PauseTotalNs)
-	storage.Store.AddGauge("StackInuse", RStats.StackInuse)
-	storage.Store.AddGauge("StackSys", RStats.StackSys)
-	storage.Store.AddGauge("Sys", RStats.Sys)
-	storage.Store.AddGauge("TotalAlloc", RStats.TotalAlloc)
-	storage.Store.AddGauge("RandomValue", rand.Float64())
-	storage.Store.AddCounter("PollCount", 1)
+	store.AddGauge("Alloc", RStats.Alloc)
+	store.AddGauge("BuckHashSys", RStats.BuckHashSys)
+	store.AddGauge("Frees", RStats.Frees)
+	store.AddGauge("GCCPUFraction", RStats.GCCPUFraction)
+	store.AddGauge("GCSys", RStats.GCSys)
+	store.AddGauge("HeapAlloc", RStats.HeapAlloc)
+	store.AddGauge("HeapIdle", RStats.HeapIdle)
+	store.AddGauge("HeapInuse", RStats.HeapInuse)
+	store.AddGauge("HeapObjects", RStats.HeapObjects)
+	store.AddGauge("HeapReleased", RStats.HeapReleased)
+	store.AddGauge("HeapSys", RStats.HeapSys)
+	store.AddGauge("LastGC", RStats.LastGC)
+	store.AddGauge("Lookups", RStats.Lookups)
+	store.AddGauge("MCacheInuse", RStats.MCacheInuse)
+	store.AddGauge("MCacheSys", RStats.MCacheSys)
+	store.AddGauge("MSpanInuse", RStats.MSpanInuse)
+	store.AddGauge("MSpanSys", RStats.MSpanSys)
+	store.AddGauge("Mallocs", RStats.Mallocs)
+	store.AddGauge("NextGC", RStats.NextGC)
+	store.AddGauge("NumForcedGC", RStats.NumForcedGC)
+	store.AddGauge("NumGC", RStats.NumGC)
+	store.AddGauge("OtherSys", RStats.OtherSys)
+	store.AddGauge("PauseTotalNs", RStats.PauseTotalNs)
+	store.AddGauge("StackInuse", RStats.StackInuse)
+	store.AddGauge("StackSys", RStats.StackSys)
+	store.AddGauge("Sys", RStats.Sys)
+	store.AddGauge("TotalAlloc", RStats.TotalAlloc)
+	store.AddGauge("RandomValue", rand.Float64())
+	store.AddCounter("PollCount", 1)
 }
 
-func SendMetrics() {
-	for k, v := range storage.Store.MGauge {
+func SendMetrics(store *storage.Storage) {
+	for k, v := range store.MGauge {
 		_, err := SendMetric(GAUGE, k, v)
 		if err != nil {
 			log.Printf("Ошибка при отправке метрики в Gauge: %s", err.Error())
 		}
 	}
 
-	storage.Store.MGauge = make(map[string]string)
+	store.MGauge = make(map[string]string)
 
-	for k, v := range storage.Store.MCounter {
+	for k, v := range store.MCounter {
 		_, err := SendMetric(COUNTER, k, strconv.FormatInt(v, 10))
 		if err != nil {
 			log.Printf("Ошибка при отправке метрики в Counter: %s", err.Error())
 		}
 	}
 
-	storage.Store.MCounter = make(map[string]int64)
+	store.MCounter = make(map[string]int64)
 }

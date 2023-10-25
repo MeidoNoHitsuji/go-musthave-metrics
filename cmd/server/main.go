@@ -14,7 +14,7 @@ func main() {
 	}
 
 	log.Printf("Сервер запущен")
-	err = http.ListenAndServe(flags.Addr, server.ServerRouter())
+	err = http.ListenAndServe(flags.Addr, server.Router())
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

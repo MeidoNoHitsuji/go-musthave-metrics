@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/handlers"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/server"
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -28,19 +27,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method,
 	return resp
 }
 
-func emptyStorage() {
-	storage.Store = &storage.MemStorage{
-		MGauge:   make(map[string]string),
-		MFloat64: make(map[string]float64),
-		MCounter: make(map[string]int64),
-		MInt64:   make(map[string]int64),
-	}
-}
-
 func TestGetMetrics(t *testing.T) {
-	srv := httptest.NewServer(server.ServerRouter())
-	defer srv.Close()
-
 	type args struct {
 		method string
 		path   string
@@ -100,7 +87,9 @@ testParam4 = 2`,
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			emptyStorage()
+			srv := httptest.NewServer(server.Router())
+			defer srv.Close()
+
 			for _, request := range tt.requests {
 				testRequest(t, srv, request.method, request.path, request.body)
 			}
@@ -112,7 +101,7 @@ testParam4 = 2`,
 }
 
 func TestAddAndGetMetric(t *testing.T) {
-	srv := httptest.NewServer(server.ServerRouter())
+	srv := httptest.NewServer(server.Router())
 	defer srv.Close()
 
 	type args struct {
@@ -217,7 +206,9 @@ func TestAddAndGetMetric(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			emptyStorage()
+			srv := httptest.NewServer(server.Router())
+			defer srv.Close()
+
 			for _, request := range tt.requests {
 				testRequest(t, srv, request.method, fmt.Sprintf("/update/%s/%s/%s", request.typeMetric, request.key, request.value), nil)
 			}

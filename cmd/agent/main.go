@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/agent"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/flags"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"log"
 	"os"
 	"os/signal"
@@ -16,10 +17,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	store := storage.New()
+
 	go func() {
 		for {
 			time.Sleep(time.Duration(flags.RollInterval) * time.Second)
-			agent.LoadMetric()
+			agent.LoadMetric(store)
 			log.Printf("Метрики собраны")
 		}
 	}()
@@ -27,7 +30,7 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Duration(flags.ReportInterval) * time.Second)
-			agent.SendMetrics()
+			agent.SendMetrics(store)
 			log.Printf("Метрики отправлены")
 		}
 	}()

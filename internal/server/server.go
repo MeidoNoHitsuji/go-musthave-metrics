@@ -5,12 +5,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func ServerRouter() chi.Router {
+func Router() chi.Router {
 	r := chi.NewRouter()
+	handler := handlers.New()
 
-	r.Get("/", handlers.GetMetrics)
-	r.Post("/update/{type}/{key}/{value}", handlers.AddMetric)
-	r.Get("/value/{type}/{key}", handlers.GetMetric)
+	r.Get("/", handler.GetMetrics)
+	r.Post("/update/{type}/{key}/{value}", handler.AddMetric)
+	r.Get("/value/{type}/{key}", handler.GetMetric)
 
 	return r
 }

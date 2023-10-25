@@ -47,7 +47,7 @@ func TestMemStorage_AddCounter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &MemStorage{
+			s := &Storage{
 				MGauge:   tt.fields.MGauge,
 				MFloat64: tt.fields.MFloat64,
 				MCounter: tt.fields.MCounter,
@@ -100,7 +100,7 @@ func TestMemStorage_AddFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &MemStorage{
+			s := &Storage{
 				MGauge:   tt.fields.MGauge,
 				MFloat64: tt.fields.MFloat64,
 				MCounter: tt.fields.MCounter,
@@ -153,7 +153,7 @@ func TestMemStorage_AddGauge(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &MemStorage{
+			s := &Storage{
 				MGauge:   tt.fields.MGauge,
 				MFloat64: tt.fields.MFloat64,
 				MCounter: tt.fields.MCounter,
@@ -206,7 +206,7 @@ func TestMemStorage_AddInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &MemStorage{
+			s := &Storage{
 				MGauge:   tt.fields.MGauge,
 				MFloat64: tt.fields.MFloat64,
 				MCounter: tt.fields.MCounter,
