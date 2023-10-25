@@ -10,6 +10,7 @@ var (
 	ReportInterval int
 	RollInterval   int
 	Addr           string
+	err            error
 )
 
 func ParseFlags() error {
@@ -23,18 +24,17 @@ func ParseFlags() error {
 	}
 
 	if envReportInterval, exists := os.LookupEnv("REPORT_INTERVAL"); exists {
-		if v, err := strconv.Atoi(envReportInterval); err != nil {
+		ReportInterval, err = strconv.Atoi(envReportInterval)
+		if err != nil {
 			return err
-		} else {
-			ReportInterval = v
 		}
+
 	}
 
 	if envPollInterval, exists := os.LookupEnv("POLL_INTERVAL"); exists {
-		if v, err := strconv.Atoi(envPollInterval); err != nil {
+		RollInterval, err = strconv.Atoi(envPollInterval)
+		if err != nil {
 			return err
-		} else {
-			RollInterval = v
 		}
 	}
 
