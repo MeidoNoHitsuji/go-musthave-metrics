@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/handlers"
 	"github.com/go-chi/chi/v5"
 )
 

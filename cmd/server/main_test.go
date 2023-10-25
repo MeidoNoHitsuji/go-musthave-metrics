@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/server"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +38,7 @@ func emptyStorage() {
 }
 
 func TestGetMetrics(t *testing.T) {
-	srv := httptest.NewServer(ServerRouter())
+	srv := httptest.NewServer(server.ServerRouter())
 	defer srv.Close()
 
 	type args struct {
@@ -111,7 +112,7 @@ testParam4 = 2`,
 }
 
 func TestAddAndGetMetric(t *testing.T) {
-	srv := httptest.NewServer(ServerRouter())
+	srv := httptest.NewServer(server.ServerRouter())
 	defer srv.Close()
 
 	type args struct {
