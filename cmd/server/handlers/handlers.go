@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/storage"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"log"

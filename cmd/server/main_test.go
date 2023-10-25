@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/handlers"
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/storage"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"net/http"
