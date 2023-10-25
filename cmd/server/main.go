@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/flags"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/server/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/flags"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
@@ -19,10 +19,13 @@ func ServerRouter() chi.Router {
 }
 
 func main() {
-	flags.ParseFlags()
+	err := flags.ParseFlags()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Printf("Сервер запущен")
-	err := http.ListenAndServe(flags.Addr, ServerRouter())
+	err = http.ListenAndServe(flags.Addr, ServerRouter())
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

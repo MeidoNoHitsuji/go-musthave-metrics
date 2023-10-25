@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/flags"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/cmd/agent/handlers"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/flags"
 	"log"
 	"os"
 	"os/signal"
