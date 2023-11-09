@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/agent"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/logger"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,44 +55,97 @@ func (h *Handler) GetMetrics(res http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) AddMetric(res http.ResponseWriter, req *http.Request) {
+	log := logger.Instant()
 	typeMetric := chi.URLParam(req, "type")
 	key := chi.URLParam(req, "key")
 	value := chi.URLParam(req, "value")
 
+	metric := agent.Metrics{
+		ID:    key,
+		MType: typeMetric,
+	}
+
 	switch typeMetric {
 	case string(GAUGE):
-		_, err := strconv.ParseFloat(value, 64)
+		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
+			log.Errorln("Ошибка параметра в Float: %s", err.Error())
 			return
 		}
-		h.store.AddGauge(key, value)
+
+		metric.Value = &v
 	case string(FLOAT):
 		v, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в Float: %s", err.Error())
+			log.Errorln("Ошибка параметра в Float: %s", err.Error())
 			return
 		}
-		h.store.AddFloat(key, v)
+
+		metric.Value = &v
 	case string(COUNTER):
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в COUNTER: %s", err.Error())
+			log.Errorln("Ошибка параметра в COUNTER: %s", err.Error())
 			return
 		}
-		h.store.AddCounter(key, v)
+
+		metric.Delta = &v
 	case string(INT):
 		v, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			res.WriteHeader(http.StatusBadRequest)
-			log.Printf("Ошибка параметра в INT: %s", err.Error())
+			log.Errorln("Ошибка параметра в INT: %s", err.Error())
 			return
 		}
-		h.store.AddInt(key, v)
+
+		metric.Delta = &v
 	default:
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	statusCode, err := h.StoreMetric(metric)
+
+	if err != nil {
+		log.Errorln(err.Error())
+	}
+
+	res.WriteHeader(statusCode)
+}
+
+func (h *Handler) AddMetricByJson(res http.ResponseWriter, req *http.Request) {
+	log := logger.Instant()
+	var metric agent.Metrics
+
+	err := json.NewDecoder(req.Body).Decode(&metric)
+	if err != nil {
+		log.Errorln("Ошибка расшифровки тела: %s", err.Error())
+	}
+
+	statusCode, err := h.StoreMetric(metric)
+
+	if err != nil {
+		log.Errorln(err.Error())
+	}
+
+	metric, _, err = h.GetMetricByStruct(metric)
+	if err != nil {
+		log.Errorln("Ошибка параметра в Float: %s", err.Error())
+	}
+
+	bytes, err := json.Marshal(metric)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		log.Errorln("Ошибка Marshal: %s", err.Error())
+		return
+	}
+
+	res.WriteHeader(statusCode)
+	_, err = res.Write(bytes)
+	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -135,4 +190,41 @@ func (h *Handler) GetMetric(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusBadRequest)
 		return
 	}
+}
+
+func (h *Handler) GetMetricByJson(res http.ResponseWriter, req *http.Request) {
+	log := logger.Instant()
+	var metric agent.Metrics
+
+	err := json.NewDecoder(req.Body).Decode(&metric)
+	if err != nil {
+		log.Errorln("Ошибка расшифровки тела: %s", err.Error())
+	}
+
+	metric, statusCode, err := h.GetMetricByStruct(metric)
+	if err != nil {
+		log.Errorln("Ошибка параметра в Float: %s", err.Error())
+	}
+
+	if statusCode >= 400 {
+		res.WriteHeader(statusCode)
+		return
+	}
+
+	bytes, err := json.Marshal(metric)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		log.Errorln("Ошибка Marshal: %s", err.Error())
+		return
+	}
+
+	res.Header().Set("Content-Type", "application/json")
+
+	_, err = res.Write(bytes)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	res.WriteHeader(statusCode)
 }

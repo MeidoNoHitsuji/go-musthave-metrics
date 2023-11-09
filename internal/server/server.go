@@ -13,8 +13,10 @@ func Router() chi.Router {
 	r.Use(middlewares.WithLogging)
 
 	r.Get("/", handler.GetMetrics)
+	r.Post("/update/", handler.AddMetricByJson)
 	r.Post("/update/{type}/{key}/{value}", handler.AddMetric)
 	r.Get("/value/{type}/{key}", handler.GetMetric)
+	r.Post("/value/", handler.GetMetricByJson)
 
 	return r
 }
