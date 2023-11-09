@@ -30,6 +30,8 @@ test-all:
 	make test3
 	make test4
 	make test5
+	make test6
+	make test7
 
 .PHONY: test1
 test1:
@@ -53,4 +55,8 @@ test5:
 
 .PHONY: test6
 test6:
-	./metricstest -test.v -test.run=^TestIteration6$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
+	./metricstest -test.v -test.run=^TestIteration6$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=
+
+.PHONY: test7
+test7:
+	./metricstest -test.v -test.run=^TestIteration7$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
