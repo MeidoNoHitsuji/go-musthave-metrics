@@ -78,7 +78,7 @@ func TestGetMetrics(t *testing.T) {
 			},
 			want: want{
 				statusCode: 200,
-				body: `testParam1 = 123.00
+				body: `testParam1 = 123
 testParam2 = 124.000000
 testParam3 = 1
 testParam4 = 2`,
@@ -137,7 +137,7 @@ func TestAddAndGetMetric(t *testing.T) {
 				statusCode: 200,
 				typeMetric: string(handlers.GAUGE),
 				key:        "testKey",
-				body:       "123.00",
+				body:       "123",
 			},
 		},
 		{

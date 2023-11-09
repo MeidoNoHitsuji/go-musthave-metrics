@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"go.uber.org/zap"
+	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/logger"
 	"net/http"
 	"time"
 )
@@ -18,8 +18,6 @@ type (
 	}
 )
 
-var sugar zap.SugaredLogger
-
 func (r *loggingResponseWriter) Write(b []byte) (int, error) {
 	size, err := r.ResponseWriter.Write(b)
 	r.responseData.size += size
@@ -32,13 +30,7 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 }
 
 func WithLogging(h http.Handler) http.Handler {
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		panic(err)
-	}
-	defer logger.Sync()
-
-	sugar = *logger.Sugar()
+	sugar := logger.Instant()
 
 	logFn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

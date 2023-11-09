@@ -18,7 +18,8 @@ func TestLoadMetric(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			LoadMetric(tt.store)
+			ag := New(tt.store, URL)
+			ag.LoadMetric()
 			assert.NotEmpty(t, tt.store.MGauge)
 			assert.NotEmpty(t, tt.store.MCounter)
 		})
