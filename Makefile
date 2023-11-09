@@ -9,6 +9,16 @@ build:
 	cd ./cmd/agent && \
 	go build -o agent *.go
 
+.PHONY: agent
+agent:
+	cd ./cmd/agent && \
+	./agent
+
+.PHONY: server
+server:
+	cd ./cmd/server && \
+	./server
+
 .PHONY: test
 test:
 	go test -cover ./...
@@ -40,3 +50,7 @@ test4:
 .PHONY: test5
 test5:
 	./metricstest -test.v -test.run=^TestIteration5$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
+
+.PHONY: test6
+test6:
+	./metricstest -test.v -test.run=^TestIteration6$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
