@@ -60,3 +60,7 @@ test6:
 .PHONY: test7
 test7:
 	./metricstest -test.v -test.run=^TestIteration7$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
+
+.PHONY: test8
+test8:
+	./metricstest -test.v -test.run=^TestIteration8$$ -agent-binary-path=cmd/agent/agent -binary-path=cmd/server/server -server-port=$(SERVER_PORT) -source-path=.
