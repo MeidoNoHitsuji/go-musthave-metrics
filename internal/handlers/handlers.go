@@ -51,6 +51,7 @@ func (h *Handler) GetMetrics(res http.ResponseWriter, req *http.Request) {
 		list = append(list, fmt.Sprintf("%s = %d", s, f))
 	}
 
+	res.Header().Set("Content-Type", "text/html")
 	io.WriteString(res, strings.Join(list, "\n"))
 }
 
