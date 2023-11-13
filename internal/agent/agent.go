@@ -1,6 +1,9 @@
 package agent
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/flags"
 	"github.com/MeidoNoHitsuji/go-musthave-metrics/internal/logger"
@@ -11,8 +14,11 @@ import (
 	"strconv"
 )
 
-type MetricType string
-type FormatType string
+type (
+	MetricType   string
+	FormatType   string
+	CompressType string
+)
 
 var (
 	RStats runtime.MemStats
@@ -27,11 +33,15 @@ const (
 
 	JSON = FormatType("json")
 	URL  = FormatType("url")
+
+	NoneCompress = CompressType("none")
+	GZIP         = CompressType("gzip")
 )
 
 type Agent struct {
-	t     FormatType
-	store *storage.Storage
+	t            FormatType
+	store        *storage.Storage
+	compressType CompressType
 }
 
 type Metrics struct {
@@ -43,18 +53,24 @@ type Metrics struct {
 
 func New(store *storage.Storage, t FormatType) *Agent {
 	return &Agent{
-		t:     t,
-		store: store,
+		t:            t,
+		store:        store,
+		compressType: NoneCompress,
 	}
+}
+
+func (a *Agent) SetCompress(compressType CompressType) {
+	a.compressType = compressType
 }
 
 func (a *Agent) SendMetric(m MetricType, name string, value string) (interface{}, error) {
 	client := resty.New()
+	request := client.R()
 	log := logger.Instant()
 
 	switch a.t {
 	case URL:
-		_, err = client.R().
+		_, err = request.
 			Post(fmt.Sprintf("http://%s/update/%s/%s/%s", flags.Addr, m, name, value))
 	case JSON:
 		obj := Metrics{
@@ -79,8 +95,35 @@ func (a *Agent) SendMetric(m MetricType, name string, value string) (interface{}
 			obj.Delta = &v
 		}
 
-		_, err = client.R().
-			SetBody(obj).
+		objByte, err := json.Marshal(obj)
+		if err != nil {
+			log.Errorln("Ошибка Marshal: %s", err.Error())
+			break
+		}
+
+		if a.compressType == GZIP {
+			request.SetHeader("Content-Encoding", "gzip")
+			var buf bytes.Buffer
+
+			gz, err := gzip.NewWriterLevel(&buf, gzip.BestSpeed)
+			if err != nil {
+				return nil, err
+			}
+
+			_, err = gz.Write(objByte)
+			if err != nil {
+				return nil, err
+			}
+
+			err = gz.Close()
+			if err != nil {
+				return nil, err
+			}
+
+		}
+
+		_, err = request.
+			SetBody(objByte).
 			SetHeader("Content-Type", "application/json").
 			Post(fmt.Sprintf("http://%s/update", flags.Addr))
 	}
