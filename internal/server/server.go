@@ -10,7 +10,7 @@ func Router() chi.Router {
 	r := chi.NewRouter()
 	handler := handlers.New()
 
-	r.Use(middlewares.WithLogging)
+	r.Use(middlewares.WithLogging, middlewares.GzipHandle, middlewares.UnzipHandle)
 
 	r.Get("/", handler.GetMetrics)
 	r.Post("/update/", handler.AddMetricByJson)
